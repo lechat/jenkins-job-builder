@@ -96,8 +96,17 @@ class Maven(jenkins_jobs.modules.base.Base):
         XML.SubElement(xml_parent, 'globalSettingConfigId')
 
         run_post_steps = XML.SubElement(xml_parent, 'runPostStepsIfResult')
-        XML.SubElement(run_post_steps, 'name').text = 'FAILURE'
-        XML.SubElement(run_post_steps, 'ordinal').text = '2'
-        XML.SubElement(run_post_steps, 'color').text = 'red'
+        post_steps_param =data['maven'].get('run-post-steps-on',
+                                             'failure').lower()
+        if post_steps_param == 'failure':
+            post_steps_values = ['FAILURE', '2', 'RED']
+        elif post_steps_param == 'unstable':
+            post_steps_values = ['UNSTABLE', '1', 'YELLOW']
+        else:
+            post_steps_values = ['SUCCESS', '0', 'BLUE']
+
+        XML.SubElement(run_post_steps, 'name').text = post_steps_values[0]
+        XML.SubElement(run_post_steps, 'ordinal').text = post_steps_values[1]
+        XML.SubElement(run_post_steps, 'color').text = post_steps_values[2]
 
         return xml_parent
